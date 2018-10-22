@@ -69,6 +69,17 @@ def read_file(file_name):
     return filtered_dic
 
 
+def print_dendo(data_list, offset, multiplier):
+    if type(data_list) == type([]):
+        print_dendo(data_list[0], offset+" "*multiplier, multiplier)
+        if len(data_list) > 1:
+            print(offset,"----|")
+            print_dendo(data_list[1], offset+" "*multiplier, multiplier)
+    else:
+        print(offset, "----", data_list)
+
+
+
 class HierarchicalClustering:
     def __init__(self, data):
         """Initialize the clustering"""
@@ -105,6 +116,13 @@ class HierarchicalClustering:
         Example call: self.cluster_distance(
             [[["Albert"], ["Branka"]], ["Cene"]],
             [["Nika"], ["Polona"]])
+        """
+
+        """
+        first we simplify the list, to lose the brackets
+        than we just easily  get the distance for every item in first group with every item  every item in the other group
+        from the distance matrix we calculated before, doing the average linkage
+        
         """
         list_one = simplify_list(c1)
         list_two = simplify_list(c2)
@@ -145,11 +163,17 @@ class HierarchicalClustering:
         for plotting of the hierarchical clustering.
         """
 
+        """
+        Caluculate distance matrix for every country
+        """
         for key, value in self.distance_dict.items():
             for inner_key, inner_value in value.iteritems():
                 distance = self.row_distance(key, inner_key)
                 self.distance_dict[key][inner_key] = distance
 
+        """
+        Main while loop, where we find clusters and update self.clusters back to have the right structure for later
+        """
         while len(self.clusters) != 2:
             list_item = self.closest_clusters()
             self.all_clusters_distance.append(list_item)
@@ -160,15 +184,13 @@ class HierarchicalClustering:
             self.clusters.remove(item_two)
             self.clusters.append(pair)
 
-        pass
-
     def plot_tree(self):
         """
         Use cluster information to plot an ASCII representation of the cluster
         tree.
         """
+        print_dendo(self.clusters, "", 2)
         pass
-
 
 if __name__ == "__main__":
     DATA_FILE = "eurovision-final.csv"
